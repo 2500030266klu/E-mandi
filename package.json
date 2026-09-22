@@ -1,0 +1,13 @@
+{
+  "name": "sih-emandi-root",
+  "version": "1.0.0",
+  "description": "Smart India Hackathon E-Mandi Platform",
+  "scripts": {
+    "build": "cd backend && npm install",
+    "start": "cd backend && npm start",
+    "install:all": "cd backend && npm install"
+  },
+  "keywords": ["sih", "e-mandi", "agriculture", "marketplace"],
+  "author": "",
+  "license": "ISC"
+}
