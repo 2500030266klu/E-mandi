@@ -14,7 +14,7 @@ services:
       - key: PORT
         value: 10000
       - key: MONGODB_URI
-        sync: false
+        value: mongodb+srv://admin:Adarsh%40123@cluster0.ulkkg90.mongodb.net/mandidb?appName=Cluster0
       - key: JWT_SECRET
         generateValue: true
       - key: GROQ_API_KEY
