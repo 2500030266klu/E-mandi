@@ -24,12 +24,14 @@ app.get('/api/health', (req, res) => {
 const authRoutes = require('./routes/authRoutes');
 const dataRoutes = require('./routes/dataRoutes');
 const speechRoutes = require('./routes/speechRoutes');
+const geminiRoutes = require('./routes/geminiRoutes');
 const authController = require('./controllers/authController');
 
 // Use Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', dataRoutes);
 app.use('/api/speech', speechRoutes);
+app.use('/api/gemini', geminiRoutes);
 
 // Compatibility alias for trader user search
 app.get('/authservice/getallusers*', authController.getUsers);
