@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Gavel, Users, CheckCircle, Search, FileText } from 'lucide-react';
+import axios from 'axios';
+import { API_BASE_URL } from '../utils/apiConfig';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
 import { useSystem } from '../context/SystemContext';
@@ -38,21 +40,52 @@ const AuctionAdminDashboard = () => {
     }
   };
 
-  // Mock Data for Farmer Sales (What farmers sold)
-  const farmerSales = [
+  // Farmer Sales (derived from transactions or default fallback)
+  const defaultFarmerSales = [
     { id: 'FMR-1022', name: 'Ramesh Kumar', crop: 'Wheat', qty: 45.50, price: '₹1,03,512', buyer: 'Global Agri Corp' },
     { id: 'FMR-3944', name: 'Suresh Singh', crop: 'Paddy', qty: 120.00, price: '₹2,61,960', buyer: 'Singh Traders' },
     { id: 'FMR-8811', name: 'Anil Sharma', crop: 'Mustard', qty: 25.00, price: '₹1,41,250', buyer: 'AgriLogistics Pvt' }
   ];
 
-  // Mock Data for Traders wanting to sell in auction to the Govt
+  const farmerSales = transactions && transactions.length > 0
+    ? transactions.map(t => ({
+        id: t.id || 'TXN-' + Math.floor(Math.random()*1000),
+        name: t.farmerName || 'Farmer',
+        crop: t.crop || t.grainType || 'Commodity',
+        qty: t.quantity || 40,
+        price: `₹${(t.total || t.totalAmount || 0).toLocaleString('en-IN')}`,
+        buyer: t.traderName || 'Authorized Trader'
+      }))
+    : defaultFarmerSales;
+
+  // Auctions data connected to backend
   const [auctions, setAuctions] = useState([
     { id: 'AUC-991', trader: 'Global Agri Corp', crop: 'Wheat', qty: 1000, askPrice: '₹2,275/Qtl', status: 'pending' },
     { id: 'AUC-992', trader: 'Singh Traders', crop: 'Paddy', qty: 500, askPrice: '₹2,183/Qtl', status: 'pending' }
   ]);
 
-  const authorizeAuction = (id) => {
-    setAuctions(auctions.map(a => a.id === id ? { ...a, status: 'authorized' } : a));
+  const fetchAuctions = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/auctions`);
+      if (res.data && res.data.length > 0) {
+        setAuctions(res.data);
+      }
+    } catch (e) {
+      console.warn("Using local auctions fallback:", e.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchAuctions();
+  }, []);
+
+  const authorizeAuction = async (id) => {
+    try {
+      await axios.put(`${API_BASE_URL}/api/auctions/${id}/authorize`);
+    } catch (e) {
+      console.warn("Backend authorize failed, updating locally:", e.message);
+    }
+    setAuctions(prev => prev.map(a => a.id === id ? { ...a, status: 'authorized' } : a));
   };
 
   return (

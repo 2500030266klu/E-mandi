@@ -14,16 +14,20 @@ export const SystemProvider = ({ children }) => {
   const fetchSystemData = async () => {
     try {
       // 1. Fetch system tables
-      const [mspRes, txRes, tokenRes, usersRes] = await Promise.all([
+      const [mspRes, txRes, tokenRes, usersRes, quotaRes] = await Promise.all([
         axios.get(`${API_BASE_URL}/api/msp`).catch(() => ({ data: [] })),
         axios.get(`${API_BASE_URL}/api/transactions`).catch(() => ({ data: [] })),
         axios.get(`${API_BASE_URL}/api/tokens`).catch(() => ({ data: [] })),
-        axios.get(`${API_BASE_URL}/api/auth/users`).catch(() => ({ data: { users: [] } }))
+        axios.get(`${API_BASE_URL}/api/auth/users`).catch(() => ({ data: { users: [] } })),
+        axios.get(`${API_BASE_URL}/api/quotas`).catch(() => ({ data: [] }))
       ]);
       
       setMsps(mspRes.data || []);
       setTransactions(txRes.data || []);
       setTokens(tokenRes.data || []);
+      if (quotaRes.data && quotaRes.data.length > 0) {
+        setQuotas(quotaRes.data);
+      }
       
       // 2. Build Admin List by filtering the users table
       const allUsers = usersRes.data.users || [];
@@ -57,9 +61,14 @@ export const SystemProvider = ({ children }) => {
   };
 
   const updateQuotas = async (newQuotas) => {
-    // We don't have a quota backend route yet, keep mock
-    setQuotas(newQuotas);
-    return true;
+    try {
+      await axios.post(`${API_BASE_URL}/api/quotas`, newQuotas);
+      await fetchSystemData();
+      return true;
+    } catch (e) {
+      setQuotas(newQuotas);
+      return true;
+    }
   };
 
   const addTransaction = async (tx) => {
