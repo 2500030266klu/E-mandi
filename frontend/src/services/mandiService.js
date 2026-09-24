@@ -7,15 +7,16 @@ export const mandiService = {
     return response.data;
   },
 
-  // Get active auctions for a specific mandi
+  // Get active auctions (all or by mandi)
   getAuctions: async (mandiId) => {
-    const response = await apiClient.get(`/mandis/${mandiId}/auctions`);
+    const endpoint = mandiId ? `/mandis/${mandiId}/auctions` : '/auctions';
+    const response = await apiClient.get(endpoint);
     return response.data;
   },
 
   // Place a bid (Trader)
-  placeBid: async (auctionId, amount) => {
-    const response = await apiClient.post(`/auctions/${auctionId}/bids`, { amount });
+  placeBid: async (auctionId, amount, bidder) => {
+    const response = await apiClient.post(`/auctions/${auctionId}/bids`, { amount, bidder });
     return response.data;
   },
 
@@ -25,7 +26,13 @@ export const mandiService = {
     return response.data;
   },
 
-  // Get transactions for the current user
+  // Get stock/inventory
+  getStock: async (farmerName) => {
+    const response = await apiClient.get('/inventory', { params: { farmerName } });
+    return response.data;
+  },
+
+  // Get transactions
   getTransactions: async () => {
     const response = await apiClient.get('/transactions');
     return response.data;
@@ -34,6 +41,36 @@ export const mandiService = {
   // Get system statistics (Management)
   getStatistics: async () => {
     const response = await apiClient.get('/statistics');
+    return response.data;
+  },
+
+  // Get procurement quotas
+  getQuotas: async () => {
+    const response = await apiClient.get('/quotas');
+    return response.data;
+  },
+
+  // Update procurement quotas
+  updateQuotas: async (quotas) => {
+    const response = await apiClient.post('/quotas', quotas);
+    return response.data;
+  },
+
+  // Get registered mandis
+  getMandis: async () => {
+    const response = await apiClient.get('/mandis');
+    return response.data;
+  },
+
+  // Get National Farmer Portal Live Stats
+  getNationalStats: async () => {
+    const response = await apiClient.get('/farmers/national-stats');
+    return response.data;
+  },
+
+  // Verify farmer across National AgriStack Registry
+  verifyFarmer: async (query) => {
+    const response = await apiClient.get('/farmers/verify-portal', { params: { q: query } });
     return response.data;
   }
 };
