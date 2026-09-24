@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: sih-backend
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        value: mongodb+srv://admin:Adarsh%40123@cluster0.ulkkg90.mongodb.net/mandidb?appName=Cluster0
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GROQ_API_KEY
+        sync: false
