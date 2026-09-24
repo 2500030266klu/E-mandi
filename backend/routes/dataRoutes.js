@@ -10,6 +10,7 @@ router.put('/tokens/:id', dataController.updateTokenStatus);
 // Transactions
 router.get('/transactions', dataController.getTransactions);
 router.post('/transactions', dataController.createTransaction);
+router.get('/transactions/:id/receipt', dataController.getTransactionReceipt);
 
 // MSPs (support both /msp and /msp-rates)
 router.get('/msp', dataController.getMsps);

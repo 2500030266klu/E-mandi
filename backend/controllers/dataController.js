@@ -498,21 +498,77 @@ exports.getStatistics = async (req, res) => {
   });
 };
 
-// --- 8. MANDIS DIRECTORY ---
+// --- 8. MANDIS DIRECTORY & RECEIPTS ---
+const { mandiData } = require('../utils/mandiData');
+const { generateReceiptHtml } = require('../utils/receiptGenerator');
+
 exports.getMandis = async (req, res) => {
-  const mandis = [
-    { id: "MND-101", name: "Indore APMC Yard", state: "Madhya Pradesh", district: "Indore", code: "MP-IND-01" },
-    { id: "MND-102", name: "Karnal Grain Market", state: "Haryana", district: "Karnal", code: "HR-KAR-01" },
-    { id: "MND-103", name: "Aligarh Krishi Mandi", state: "Uttar Pradesh", district: "Aligarh", code: "UP-ALI-01" },
-    { id: "MND-104", name: "Ludhiana New Grain Market", state: "Punjab", district: "Ludhiana", code: "PB-LUD-01" },
-    { id: "MND-105", name: "Nashik Agricultural Market", state: "Maharashtra", district: "Nashik", code: "MH-NAS-01" },
-    { id: "MND-106", name: "Kota Grain Mandi", state: "Rajasthan", district: "Kota", code: "RJ-KOT-01" },
-    { id: "MND-107", name: "Guntur Chilli & Grain Yard", state: "Andhra Pradesh", district: "Guntur", code: "AP-GUN-01" },
-    { id: "MND-108", name: "Warangal Cotton & Paddy Mandi", state: "Telangana", district: "Warangal", code: "TS-WAR-01" },
-    { id: "MND-109", name: "Rajkot Marketing Yard", state: "Gujarat", district: "Rajkot", code: "GJ-RAJ-01" },
-    { id: "MND-110", name: "Davangere APMC Yard", state: "Karnataka", district: "Davangere", code: "KA-DAV-01" }
-  ];
-  res.status(200).json(mandis);
+  try {
+    const { state, district, search } = req.query;
+    let results = Array.isArray(mandiData) ? [...mandiData] : [];
+    if (state) {
+      results = results.filter(m => m.State && m.State.toLowerCase() === state.toLowerCase());
+    }
+    if (district) {
+      results = results.filter(m => m.District && m.District.toLowerCase() === district.toLowerCase());
+    }
+    if (search) {
+      const s = search.toLowerCase();
+      results = results.filter(m => 
+        (m.MandiName && m.MandiName.toLowerCase().includes(s)) || 
+        (m.District && m.District.toLowerCase().includes(s)) || 
+        (m.State && m.State.toLowerCase().includes(s))
+      );
+    }
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getTransactionReceipt = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { language = 'en' } = req.query;
+
+    let tx = memoryTransactions.find(t => t.id === id);
+    if (!tx && isDbConnected()) {
+      tx = await Transaction.findOne({ id });
+    }
+
+    if (!tx) {
+      tx = {
+        id: id || 'TXN-9021',
+        date: new Date().toISOString(),
+        farmerName: 'Ramesh Kumar',
+        crop: 'Wheat',
+        quantity: '45.50 Qtl',
+        price: 2275,
+        total: 103512.50,
+        traderName: 'AgriCorp Traders',
+        status: 'Completed'
+      };
+    }
+
+    const html = generateReceiptHtml({
+      txnId: tx.id || id,
+      date: tx.date || new Date().toISOString(),
+      farmerName: tx.farmerName || 'Farmer',
+      farmerId: tx.farmerId || 'UP-4592-88',
+      buyer: tx.traderName || 'Authorized Trader',
+      commodity: tx.crop || tx.grainType || 'Wheat',
+      qty: String(tx.quantity).includes('Qtl') ? tx.quantity : `${tx.quantity} Qtl`,
+      rate: tx.price || tx.pricePerQuintal || 2275,
+      amount: tx.total || tx.totalAmount || 103512,
+      status: tx.status || 'Completed',
+      language
+    });
+
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).send(html);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 // --- 9. NATIONAL FARMER REGISTRY & GOVT PORTAL LIVE STATS ---
