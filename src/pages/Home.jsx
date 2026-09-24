@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Leaf, ShieldCheck, TrendingUp, Users, Sprout, Building, LogIn, ChevronRight, Briefcase, BarChart3, Activity } from 'lucide-react';
+import { ArrowRight, Leaf, ShieldCheck, TrendingUp, Users, Sprout, Building, LogIn, ChevronRight, Briefcase, BarChart3, Activity, Sparkles, Mic } from 'lucide-react';
 import WeatherWidget from '../components/WeatherWidget';
 import NationalFarmerStats from '../components/NationalFarmerStats';
 import { useSettings } from '../context/SettingsContext';
@@ -63,6 +63,28 @@ const Home = () => {
                   <li className="flex gap-2 items-start text-sm text-emerald-100/90"><div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0"></div><p>{t.pmfby}</p></li>
                   <li className="flex gap-2 items-start text-sm text-emerald-100/90"><div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0"></div><p>{t.kcc}</p></li>
                 </ul>
+             </div>
+
+             <div className="bg-gradient-to-r from-blue-950/70 via-indigo-950/70 to-purple-950/70 backdrop-blur-md border border-indigo-400/40 p-4 sm:p-5 rounded-2xl flex items-center justify-between shadow-lg">
+                <div className="flex items-center gap-3.5">
+                   <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-400 via-indigo-500 to-purple-500 p-0.5 shadow-md shrink-0">
+                      <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                         <Sparkles size={20} className="text-amber-300 animate-spin-slow" />
+                      </div>
+                   </div>
+                   <div>
+                      <div className="flex items-center gap-2">
+                         <h4 className="font-extrabold text-white text-sm sm:text-base">Gemini Agri-AI Assistant</h4>
+                         <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">Active</span>
+                      </div>
+                      <p className="text-xs text-indigo-100/90 mt-0.5">Trilingual voice assistant & real-time MSP intelligence. Tap the badge at bottom-right or speak!</p>
+                   </div>
+                </div>
+                <div className="shrink-0 ml-2 hidden sm:block">
+                   <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-xl border border-white/20">
+                      <Mic size={14} className="text-rose-400 animate-pulse" /> Voice Active
+                   </span>
+                </div>
              </div>
 
              <div className="transition duration-300">
