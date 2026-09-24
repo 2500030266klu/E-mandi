@@ -15,4 +15,8 @@ router.post('/transactions', dataController.createTransaction);
 router.get('/msp', dataController.getMsps);
 router.post('/msp', dataController.updateMsps);
 
+// National Farmer Portal Live Stats & Verification
+router.get('/farmers/national-stats', dataController.getNationalFarmerStats);
+router.get('/farmers/verify-portal', dataController.verifyGovtFarmerPortal);
+
 module.exports = router;

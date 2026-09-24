@@ -34,6 +34,22 @@ app.use('/api/speech', speechRoutes);
 // Compatibility alias for trader user search
 app.get('/authservice/getallusers*', authController.getUsers);
 
+// Serve static frontend build if present
+const path = require('path');
+const fs = require('fs');
+const publicPath = path.join(__dirname, 'public');
+if (fs.existsSync(publicPath)) {
+  app.use(express.static(publicPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/authservice')) return next();
+    const indexPath = path.join(publicPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+    next();
+  });
+}
+
 // Start Server
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
