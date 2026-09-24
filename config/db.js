@@ -8,11 +8,13 @@ const DEFAULT_MONGODB_URI = 'mongodb+srv://admin:Adarsh%40123@cluster0.ulkkg90.m
 const connectDB = async () => {
   try {
     const uri = process.env.MONGODB_URI || process.env.MONGO_URI || DEFAULT_MONGODB_URI;
-    const conn = await mongoose.connect(uri);
+    const conn = await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 8000
+    });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error(`Error connecting to MongoDB: ${error.message}`);
-    process.exit(1);
+    console.error(`Warning: MongoDB connection issue: ${error.message}`);
+    console.log('App will continue running and serve cached/fallback data if MongoDB is reconnecting.');
   }
 };
 
